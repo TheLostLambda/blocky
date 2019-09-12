@@ -1,0 +1,3 @@
+welcome_msgs = [
+  "Welcome to the server, {name}",
+]
