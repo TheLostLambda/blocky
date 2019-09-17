@@ -11,3 +11,4 @@ toml = "*"
 serde = { version = "*", features = ["derive"] }
 runtime-fmt = { git = "https://github.com/fdb-hiroshima/runtime-fmt.git", branch = "xid-1.39" }
 rand = "*"
+regex = "*"

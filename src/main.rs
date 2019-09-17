@@ -26,7 +26,7 @@ fn main() {
             process::exit(1)
         });
         let line = blocky::trim_leader(&line);
-        let resp = block.respond(line).unwrap_or_else(|err| {
+        let resp = block.respond(line.trim()).unwrap_or_else(|err| {
             eprintln!("{}", err);
             process::exit(1)
         });

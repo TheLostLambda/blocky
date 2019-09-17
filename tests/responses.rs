@@ -1,12 +1,16 @@
-use blocky::Blocky;
+use blocky::{Blocky, CmdTable};
 use std::fs::{self, File};
 use std::io::prelude::*;
 
 const RESPONSE_FILE: &str = "blocky_test.toml";
 
-const DATA: &[u8] = br#"welcome_msgs = [
-  "Welcome to the server, {name}",
-]"#;
+const DATA: &[u8] = br#"
+cmd_leader = "Blocky, "
+welcome_msgs = [ "Welcome to the server, {name}!" ]
+timeout_msgs = [ "Splish splash, {name}'s Internet is trash." ]
+[cmds]
+teleport = "take me to (\\w*)"
+"#;
 
 fn setup_file_tests() {
     let mut fh = File::create(RESPONSE_FILE).unwrap_or_else(|err| {
@@ -37,7 +41,10 @@ fn loads_toml() {
     });
     cleanup_file_tests();
     let expect_resp = Blocky {
-        welcome_msgs: vec!["Welcome to the server, {name}".to_string()],
+        cmd_leader: "Blocky, ".to_string(),
+        welcome_msgs: vec!["Welcome to the server, {name}!".to_string()],
+        timeout_msgs: vec!["Splish splash, {name}'s Internet is trash.".to_string()],
+        cmds: CmdTable { teleport: r"take me to (\w*)".to_string() },
     };
     assert_eq!(resp, expect_resp);
 }
@@ -51,12 +58,65 @@ fn welcomes_user() {
             RESPONSE_FILE, err
         );
     });
-    let msg = String::from("SheerFreeze joined the game");
+    let msg = "SheerFreeze joined the game";
     let resp = block.respond(msg);
     cleanup_file_tests();
     assert_eq!(
         resp,
-        Ok("/say Welcome to the server, SheerFreeze\n".to_string())
+        Ok("/say Welcome to the server, SheerFreeze!\n".to_string())
     );
-    // Change to a contains name and includes response tests
+}
+
+#[test]
+fn rip_user() {
+    setup_file_tests();
+    let block = Blocky::new(RESPONSE_FILE).unwrap_or_else(|err| {
+        panic!(
+            "An error occurred while parsing from {}. The error was: {}",
+            RESPONSE_FILE, err
+        );
+    });
+    let msg = "Zozzor lost connection: Timed out";
+    let resp = block.respond(msg);
+    cleanup_file_tests();
+    assert_eq!(
+        resp,
+        Ok("/say Splish splash, Zozzor's Internet is trash.\n".to_string())
+    );
+}
+
+#[test]
+fn teleport_user() {
+    setup_file_tests();
+    let block = Blocky::new(RESPONSE_FILE).unwrap_or_else(|err| {
+        panic!(
+            "An error occurred while parsing from {}. The error was: {}",
+            RESPONSE_FILE, err
+        );
+    });
+    let msg = "<Zozzor> Blocky, take me to Sheerfreeze";
+    let resp = block.respond(msg);
+    cleanup_file_tests();
+    assert_eq!(
+        resp,
+        Ok("/teleport Zozzor Sheerfreeze\n".to_string())
+    );
+}
+
+#[test]
+fn bad_command() {
+    setup_file_tests();
+    let block = Blocky::new(RESPONSE_FILE).unwrap_or_else(|err| {
+        panic!(
+            "An error occurred while parsing from {}. The error was: {}",
+            RESPONSE_FILE, err
+        );
+    });
+    let msg = "<Zozzor> Blocky, what is the meaning of life?";
+    let resp = block.respond(msg);
+    cleanup_file_tests();
+    assert_eq!(
+        resp,
+        Ok("/say \"what is the meaning of life?\" is not a valid command...\n".to_string())
+    );
 }
