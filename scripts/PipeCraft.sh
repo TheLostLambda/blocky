@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Command for launching the Minecraft server
 MCCMD="java -jar server.jar -nogui"
