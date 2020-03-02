@@ -74,7 +74,7 @@ impl Blocky {
                 Ok(format!(
                     "/say \"{}\" is not a valid command...\n",
                     m.split_whitespace()
-                        .skip_while(|w| {println!("skip: {}", w); w != &self.cmd_leader.trim()})
+                        .skip_while(|w| w != &self.cmd_leader.trim())
                         .skip(1)
                         .collect::<Vec<_>>()
                         .join(" ")

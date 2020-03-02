@@ -6,6 +6,7 @@ A programmable Minecraft server bot!
 * Add some tests for the random responses?
 * Add Minecraft colours and formatting to server messages
 * Fix hanging processes (on failed sudo)
+* Make string matching a bit more fuzzy
 
 ## Commands
 * Get player location: `/execute positioned as {name} run teleport {name} ~ ~ ~`
