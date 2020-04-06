@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Command for launching the Minecraft server
-MCCMD="java -jar server.jar -nogui"
+MCCMD="java -Xmx1024M -Xms1024M -jar server.jar -nogui"
 
 # Command for launching the Bot
 BOTCMD="./blocky"
